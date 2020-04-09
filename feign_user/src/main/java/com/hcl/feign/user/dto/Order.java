@@ -1,4 +1,4 @@
-package com.hcl.orders.dto;
+package com.hcl.feign.user.dto;
 
 public class Order {
 
