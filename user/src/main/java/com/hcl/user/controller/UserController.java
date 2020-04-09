@@ -3,8 +3,10 @@ package com.hcl.user.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,56 +26,46 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/users")
 public class UserController {
 
-	RestTemplate restTemplate = RestTemplateSingleton.getInstance();
+	//RestTemplate restTemplate = RestTemplateSingleton.getInstance();
 
-	@GetMapping("") 
+	@Autowired
+	RestTemplate restTemplate;
+	
+	static String baseURIForOrderSer = "http://ORDER-SERVICE/demo/orders";
+
+	@GetMapping("")
 	public String getUserOrders() {
 
-		final String uri = "http://localhost:8081/demo/orders";
-
-		String result = restTemplate.getForObject(uri, String.class);
-
-		return result;
-
+		return restTemplate.getForObject(baseURIForOrderSer, String.class);
 	}
 
 	@GetMapping("/{userId}")
 	public String getUserOrdersById(@PathVariable String userId) {
 
-		final String uri = "http://localhost:8081/demo/orders/" + userId;
-
-		String result = restTemplate.getForObject(uri, String.class);
-
-		return result;
+		return restTemplate.getForObject(baseURIForOrderSer + "/" + userId, String.class);
 
 	}
 
 	@GetMapping("/byReqParam")
-	public String getUserOrdersByReqParam(@RequestParam("userId") String userId) {
-
-		final String uri = "http://localhost:8081/demo/orders/byReqParam";
+	public String getUserOrdersByReqParam(@RequestParam String userId) {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		params.put("userId", userId);
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseURIForOrderSer + "/byReqParam");
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			builder.queryParam(entry.getKey(), entry.getValue());
 		}
 
-		String result = restTemplate.getForObject(builder.toUriString(), String.class);
-
-		return result;
+		return restTemplate.getForObject(builder.toUriString(), String.class);
 
 	}
 
 	@GetMapping("/postParam")
 	public ResponseEntity<String> testPostWithParam(@RequestParam String userId) {
-
-		String uri = "http://localhost:8081/demo/orders/byPostReqParam";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -83,16 +75,15 @@ public class UserController {
 
 		HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
-		ResponseEntity<String> response = restTemplate.postForEntity(uri, httpEntity, String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(baseURIForOrderSer + "/byPostReqParam", httpEntity,
+				String.class);
 
 		System.out.println(response);
 		return response;
 	}
 
 	@GetMapping("/byBody")
-	public ResponseEntity<String> testReqBody() throws JSONException {
-
-		String uri = "http://localhost:8081/demo/orders/byBody";
+	public ResponseEntity<String> testReqBody() {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -101,9 +92,9 @@ public class UserController {
 		request.put("id", 110);
 		request.put("des", "test10");
 
-		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
-		ResponseEntity<String> response = restTemplate.postForEntity(uri, entity, String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(baseURIForOrderSer + "/byBody", entity, String.class);
 
 		System.out.println(response);
 		return response;
@@ -111,7 +102,7 @@ public class UserController {
 	}
 
 	@GetMapping("/byBody2")
-	public ResponseEntity<String> testReqBody2() throws JSONException {
+	public ResponseEntity<String> testReqBody2() {
 
 		String uri = "http://localhost:8081/demo/orders/byBody";
 
@@ -122,21 +113,30 @@ public class UserController {
 		request.put("id", 1122);
 		request.put("des", "usk1");
 
-		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
-		ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
-		return response;
-
+		return restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
 	}
 
-	public static class RestTemplateSingleton  {    
-	    private static class RestTemplateSingletonHolder {    
-	        public static final RestTemplate instance = new RestTemplate();
-	    }    
-
-	    public static RestTemplate getInstance() {    
-	        return RestTemplateSingletonHolder.instance;    
-	    }    
+	@LoadBalanced
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
+	
+	
+	/*public static class RestTemplateSingleton {
+
+		private RestTemplateSingleton() {
+		}
+
+		private static class RestTemplateSingletonHolder {
+			public static final RestTemplate instance = new RestTemplate();
+		}
+
+		public static RestTemplate getInstance() {
+			return RestTemplateSingletonHolder.instance;
+		}
+	}*/
 
 }

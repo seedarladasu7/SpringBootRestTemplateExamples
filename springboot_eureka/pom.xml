@@ -8,10 +8,10 @@
 		<version>2.2.6.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.hcl</groupId>
-	<artifactId>orders</artifactId>
+	<groupId>com.example.eureka.cloud.spring</groupId>
+	<artifactId>springboot_eureka</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>orders</name>
+	<name>springboot_eureka</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -26,9 +26,9 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -47,6 +47,7 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

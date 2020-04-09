@@ -60,7 +60,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/byReqParam")
-	public List<Order> getAllByReqParam(@RequestParam("userId") String userId) {
+	public List<Order> getAllByReqParam(@RequestParam String userId) {
 
 		System.out.println(sysoOrderCtrl + userId);
 
