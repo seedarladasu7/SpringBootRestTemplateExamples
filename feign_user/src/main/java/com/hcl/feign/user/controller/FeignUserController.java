@@ -20,6 +20,11 @@ public class FeignUserController {
 	@Autowired
 	OrderClient orderClient;
 	
+	@GetMapping("/info")
+	public String getPorts() {
+		return orderClient.getPort();
+	}
+	
 	@GetMapping("")
 	public List<Order> getUserOrders() {
 		return orderClient.getAll();

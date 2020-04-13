@@ -3,6 +3,8 @@ package com.hcl.orders.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +18,9 @@ import com.hcl.orders.dto.Order;
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
+	
+	@Autowired
+	Environment env;
 	
 	static String sysoOrderCtrl = "from order controller ===============>>";
 
@@ -39,6 +44,14 @@ public class OrderController {
 		return orders;
 	}
 
+	@GetMapping("/info") 
+	public String getPort(){
+		String port = env.getProperty("local.server.port");
+		
+		return port;
+	}
+	
+	
 	@GetMapping("/{userId}")
 	public List<Order> getAllById(@PathVariable String userId) {
 

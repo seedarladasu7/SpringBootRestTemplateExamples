@@ -16,6 +16,9 @@ public interface OrderClient {
 	@GetMapping("")
 	public List<Order> getAll();
 	
+	@GetMapping("/info")
+	public String getPort();
+	
 	@GetMapping("/{userId}")
 	public List<Order> getUserOrdersById(@PathVariable("userId") String userId);
 	
